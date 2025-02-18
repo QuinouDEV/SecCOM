@@ -42,10 +42,8 @@ def broadcast(decrypted_message, sender_socket):
 def handle_client(client_socket, addr):
     print(f"Nouvelle connexion : {addr}")
     
-    # Envoi de la clé publique au client
     client_socket.sendall(public_key.save_pkcs1())
 
-    # Réception de la clé symétrique chiffrée
     encrypted_key = client_socket.recv(1024)
     sym_key = int(rsa.decrypt(encrypted_key, private_key).decode())
     keys[client_socket] = sym_key
@@ -59,11 +57,9 @@ def handle_client(client_socket, addr):
             if not message:
                 break
             
-            # Déchiffrement du message reçu avec la clé du client
             decrypted_message = caesar_cipher(message.decode(), -sym_key)
             print(f"Message reçu de {addr} : {decrypted_message}")
 
-            # Retransmission aux autres clients avec leurs propres clés symétriques
             broadcast(decrypted_message, client_socket)  
         except:
             break
